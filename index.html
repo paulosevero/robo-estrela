@@ -118,6 +118,10 @@
   .overlay .big { width: min(40vh, 60vw); animation: pop .6s ease-out }
   #final .big { width: min(28vh, 40vw) }
   @keyframes pop { from { transform: scale(0) rotate(-90deg) } }
+  #stars { display: flex; gap: 2vw }
+  #stars svg { width: min(22vh, 26vw); height: min(22vh, 26vw); animation: pop .5s ease-out backwards }
+  #stars svg.off { filter: grayscale(1); opacity: .3 }
+  #queue sub { font-size: 50%; margin-left: 1px }
   .enter { font-size: 40px; font-weight: 900; background: var(--play); color: #fff; border-radius: 18px; padding: 10px 28px; box-shadow: 0 6px 0 #1f7a41 }
   .confetti { position: absolute; top: -20px; width: 14px; height: 22px; animation: fall linear forwards }
   @keyframes fall { to { transform: translateY(110vh) rotate(720deg) } }
@@ -132,7 +136,8 @@
   @media (max-width: 600px) {
     main { flex-direction: column; align-items: center; gap: 10px }
     #code { width: 90vw; max-height: 18vh; overflow: auto }
-    nav { flex-wrap: wrap; justify-content: center; max-width: 380px; gap: 10px 12px }
+    body { padding: 8px 12px }
+    nav { flex-wrap: wrap; justify-content: center; max-width: 380px; gap: 10px 8px }
     nav button { width: 80px; height: 80px }
     nav .erase, nav .play { order: 1; margin: 0 }
     #queue { gap: 3px }
@@ -152,10 +157,11 @@
   <button data-key="ArrowUp" tabindex="-1">↑</button>
   <button data-key="ArrowDown" tabindex="-1">↓</button>
   <button data-key="ArrowRight" tabindex="-1">→</button>
+  <button data-key="repeat" tabindex="-1">🔁</button>
   <button class="play" data-key="Enter" tabindex="-1">▶</button>
 </nav>
 
-<div id="win" class="overlay"><svg class="big" viewBox="0 0 100 100"><use href="#star"/></svg><div class="enter">⏎</div></div>
+<div id="win" class="overlay"><div id="stars"></div><div class="enter">⏎</div></div>
 
 <div id="final" class="overlay">
   <svg class="big" viewBox="0 0 100 100"><use href="#bot"/></svg>
@@ -208,6 +214,9 @@ const MOVES = {
   ArrowRight: [0, 1, "→", "direita"],
 }
 const QUEUE_LIMIT = 10
+
+// Storing the fewest blocks that solve each level, using repeat blocks of up to 3 steps, to award 3 stars
+const FEWEST_BLOCKS = [1, 2, 3, 3, 4]
 const board = document.getElementById("board")
 const robot = document.createElement("div")
 robot.id = "robot"
@@ -270,9 +279,11 @@ function draw(current = -1) {
   document.getElementById("dots").innerHTML = LEVELS.map((_, index) =>
     `<span class="dot ${index < level ? "done" : ""} ${index === level ? "now" : ""}"></span>`).join(" ")
   document.getElementById("queue").innerHTML = Array.from({ length: QUEUE_LIMIT }, (_, index) =>
-    `<li data-index="${index}" class="${queue[index] ? "full" : ""} ${index === current ? "now" : ""} ${index === culprit ? "bad" : ""}">${queue[index] ? MOVES[queue[index]][2] : ""}</li>`).join("")
-  document.getElementById("code").innerHTML = queue.map((key, index) =>
-    `<li class="${index === current ? "now" : ""} ${index === culprit ? "bad" : ""}">${MOVES[key][2]} robô.${MOVES[key][3]}()</li>`).join("")
+    `<li data-index="${index}" class="${queue[index] ? "full" : ""} ${index === current ? "now" : ""} ${index === culprit ? "bad" : ""}">${queue[index] ? MOVES[queue[index].key][2] + (queue[index].times > 1 ? `<sub>×${queue[index].times}</sub>` : "") : ""}</li>`).join("")
+  document.getElementById("code").innerHTML = queue.map(({ key, times }, index) => {
+    const command = `${MOVES[key][2]} robô.${MOVES[key][3]}()`
+    return `<li class="${index === current ? "now" : ""} ${index === culprit ? "bad" : ""}">${times > 1 ? `repetir ${times} { ${command} }` : command}</li>`
+  }).join("")
 
   // Scrolling the code panel to the lit line, since on phones the panel is short
   document.querySelector("#code .now, #code .bad")?.scrollIntoView({ block: "nearest" })
@@ -284,18 +295,20 @@ async function play() {
   running = true
   culprit = -1
   let position = start
-  for (const [index, key] of queue.entries()) {
+  steps: for (const [index, { key, times }] of queue.entries()) {
     draw(index)
-    const [row, column] = [position[0] + MOVES[key][0], position[1] + MOVES[key][1]]
-    const symbol = rows[row]?.[column]
-    if (symbol === undefined || symbol === "#") {
-      culprit = index
-      break
+    for (let step = 0; step < times; step++) {
+      const [row, column] = [position[0] + MOVES[key][0], position[1] + MOVES[key][1]]
+      const symbol = rows[row]?.[column]
+      if (symbol === undefined || symbol === "#") {
+        culprit = index
+        break steps
+      }
+      position = [row, column]
+      placeRobot(position)
+      await wait(500)
+      if (symbol === "*") return win()
     }
-    position = [row, column]
-    placeRobot(position)
-    await wait(500)
-    if (symbol === "*") return win()
   }
 
   // Shaking the robot and sending it back to the start, keeping the queue so the child fixes only the wrong step
@@ -322,6 +335,11 @@ function win() {
     piece.style.animationDelay = Math.random() * 0.6 + "s"
     overlay.append(piece)
   }
+
+  // Awarding 3 stars for the shortest program, 2 for up to two extra blocks and 1 otherwise
+  const stars = queue.length <= FEWEST_BLOCKS[level] ? 3 : queue.length <= FEWEST_BLOCKS[level] + 2 ? 2 : 1
+  document.getElementById("stars").innerHTML = [0, 1, 2].map(index =>
+    `<svg viewBox="0 0 100 100" class="${index < stars ? "" : "off"}" style="animation-delay: ${index * 0.3}s"><use href="#star"/></svg>`).join("")
   overlay.classList.add("show")
   level++
   draw()
@@ -342,16 +360,24 @@ function press(key) {
     if (level < LEVELS.length) return loadLevel(level)
     return document.getElementById("final").classList.add("show")
   }
+  // Turning the repeat button into a key that cycles the last block through 1, 2 and 3 repetitions
+  const last = queue.at(-1)
+  if (key === "repeat" && last) key = String(last.times % 3 + 1)
   if (MOVES[key] && queue.length < QUEUE_LIMIT) {
-    queue.push(key)
+    queue.push({ key, times: 1 })
     culprit = -1
     beep([440])
+  } else if (["1", "2", "3"].includes(key) && last) {
+    last.times = Number(key)
+    culprit = -1
+    beep([440, 550, 660].slice(0, last.times))
   } else if (key === "Backspace") {
     queue.splice(culprit >= 0 ? culprit : queue.length - 1, 1)
     culprit = -1
   } else if (key === "Enter" || key === " ") return play()
   else if (key === "r" || key === "R") return loadLevel(level)
-  else if (LEVELS[key - 1]) return loadLevel(key - 1)
+  else if (key === "PageDown") return loadLevel((level + 1) % LEVELS.length)
+  else if (key === "PageUp") return loadLevel((level + LEVELS.length - 1) % LEVELS.length)
   else if (key === "m" || key === "M") toggleMute()
   draw()
 }
