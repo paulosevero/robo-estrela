@@ -117,11 +117,13 @@
   .overlay.show { display: flex }
   .overlay .big { width: min(40vh, 60vw); animation: pop .6s ease-out }
   #final { overflow: auto; justify-content: flex-start; padding: 16px }
+  #final > * { flex-shrink: 0 }
   #final > :first-child { margin-top: auto }
   #final > :last-child { margin-bottom: auto }
   #final .adults span { overflow-wrap: anywhere }
   #final .big { width: min(18vh, 30vw) }
   .facts { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 1000px; margin: 0; padding: 0; list-style: none }
+  .highlight { background: var(--play); color: #fff; border-radius: 999px; padding: 8px 24px; font-size: min(30px, 5.5vw); font-weight: 900; box-shadow: 0 5px 0 #1f7a41 }
   .facts li { background: #fff; border: 3px solid var(--ink); border-radius: 999px; padding: 6px 16px; font-size: min(19px, 4vw); font-weight: 700 }
   @keyframes pop { from { transform: scale(0) rotate(-90deg) } }
   #stars { display: flex; gap: 2vw }
@@ -170,13 +172,12 @@
 <div id="final" class="overlay">
   <svg class="big" viewBox="0 0 100 100"><use href="#bot"/></svg>
   <p>Você programou um robô! Isso é Engenharia de Software. Na UNIPAMPA a gente aprende a fazer isso.</p>
+  <div class="highlight">🆓 GRATUITO, com projetos e bolsas</div>
   <ul class="facts">
-    <li>🎓 Bacharelado em Engenharia de Software</li>
-    <li>📍 UNIPAMPA, Campus Alegrete (RS)</li>
-    <li>🏛️ Universidade federal, pública e gratuita</li>
-    <li>🌙 50 vagas por ano, curso noturno</li>
+    <li>⭐ Nota máxima no MEC</li>
+    <li>🛠️ Mão na massa desde o 1º semestre</li>
+    <li>🌙 Noturno</li>
     <li>⏳ 9 semestres</li>
-    <li>💻 Programar · 🧪 testar · 🐞 consertar bugs</li>
   </ul>
   <div class="adults">
     <div><svg viewBox="0 0 37 37" shape-rendering="crispEdges"><use href="#play-qr"/></svg><b>📱 Jogue no celular</b><span>paulosevero.github.io/robo-estrela</span></div>
