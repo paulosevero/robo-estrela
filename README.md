@@ -1,6 +1,6 @@
 # Robô pega a estrela
 
-Jogo de navegador para apresentar o curso de Engenharia de Software da UNIPAMPA a crianças de 5 a 8 anos. A criança monta uma sequência de setas, aperta play e o robô anda pela grade até a estrela. Se o robô bater numa pedra, o passo errado fica vermelho e a criança conserta só esse passo.
+Jogo de navegador para apresentar o curso de Engenharia de Software da UNIPAMPA a crianças. A criança monta uma sequência de setas, aperta play e o robô anda pela grade até a estrela. Se o robô bater numa pedra, o passo errado fica vermelho e a criança conserta só esse passo.
 
 **[Jogar agora](https://paulosevero.github.io/robo-estrela/)**
 
