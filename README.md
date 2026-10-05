@@ -42,6 +42,19 @@ O jogo é um único arquivo, `index.html`, feito com HTML, CSS e JavaScript puro
 
 Os níveis ficam na lista `LEVELS`, no início do script. Cada nível é uma lista de linhas de texto em que `R` é o robô, `*` é a estrela, `#` é uma pedra e `.` é uma casa livre. Ao mudar um nível, atualize também o número de passos do caminho mais curto na lista `FEWEST_STEPS`, que decide as estrelas.
 
+## Ninja dos Bugs
+
+A pasta `ninja/` tem um segundo jogo, com o mesmo visual. Bugs saltam pela tela e a pessoa desliza o dedo para cortá-los, sem cortar o robô. Cada corte aparece também como uma linha de código, como `bug.consertar()`. No fim, a tela mostra as estrelas, os destaques do curso e os dois QR codes.
+
+**[Jogar o Ninja dos Bugs](https://paulosevero.github.io/robo-estrela/ninja/)**
+
+- O bug comum vale 10 pontos, o dourado vale 30 e o bug gigante, que precisa de três cortes, vale 50.
+- Cortar três bugs ou mais num só movimento dá um bônus de combo.
+- Cada robô cortado custa uma das três vidas, e a partida dura 30 segundos.
+- A pessoa ganha 2 estrelas com 150 pontos e 3 estrelas com 300 pontos.
+
+O jogo funciona com o dedo no celular e com o mouse no notebook. Enter ou Espaço avança as telas, M liga e desliga o som e Q mostra o QR code em tela cheia. A duração, as vidas e os pontos das estrelas ficam no início do script, em `ROUND_LENGTH`, `LIVES` e `STAR_POINTS`.
+
 ## Licença
 
 Código sob a licença MIT. Veja o arquivo [LICENSE](LICENSE).
