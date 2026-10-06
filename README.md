@@ -50,10 +50,17 @@ A pasta `ninja/` tem um segundo jogo, com o mesmo visual. Bugs saltam pela tela 
 
 - O bug comum vale 10 pontos, o dourado vale 30 e o bug gigante, que precisa de três cortes, vale 50.
 - Cortar três bugs ou mais num só movimento dá um bônus de combo.
-- Cada robô cortado custa uma das três vidas, e a partida dura 30 segundos.
-- A pessoa ganha 2 estrelas com 150 pontos e 3 estrelas com 300 pontos.
+- Cada robô cortado custa uma vida, e a partida dura 30 segundos.
 
-O jogo funciona com o dedo no celular e com o mouse no notebook. Enter ou Espaço avança as telas, M liga e desliga o som e Q mostra o QR code em tela cheia. A duração, as vidas e os pontos das estrelas ficam no início do script, em `ROUND_LENGTH`, `LIVES` e `STAR_POINTS`.
+Na primeira tela, a pessoa escolhe um de três níveis:
+
+| Nível     | Velocidade  | Vidas | Bugs    | Robôs  | Estrelas (2 e 3) |
+| --------- | ----------- | ----- | ------- | ------ | ---------------- |
+| 🌱 Fácil   | mais lenta  | 5     | maiores | menos  | 100 e 200 pontos |
+| ⚡ Normal  | normal      | 3     | normais | normal | 150 e 300 pontos |
+| 🔥 Desafio | mais rápida | 2     | menores | mais   | 200 e 400 pontos |
+
+O jogo funciona com o dedo no celular e com o mouse no notebook. As teclas 1, 2 e 3 escolhem o nível, Enter ou Espaço repete o último nível e avança as telas, M liga e desliga o som e Q mostra o QR code em tela cheia. A duração fica em `ROUND_LENGTH` e os níveis ficam na lista `LEVELS`, no início do script.
 
 ## Licença
 

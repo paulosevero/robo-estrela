@@ -129,6 +129,29 @@
   #stars { display: flex; gap: 2vw }
   #stars svg { width: min(22vh, 26vw); height: min(22vh, 26vw); animation: pop .5s ease-out backwards }
   #stars svg.off { filter: grayscale(1); opacity: .3 }
+  #levels { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px }
+  #levels button {
+    width: min(150px, 27vw);
+    padding: 10px 0 8px;
+    border: none;
+    border-radius: 18px;
+    background: #ffd84d;
+    box-shadow: 0 6px 0 #b8941a;
+    color: var(--ink);
+    font-size: min(44px, 9vw);
+    font-weight: 900;
+    line-height: 1.1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+  }
+  #levels button span { font-size: min(20px, 4.4vw) }
+  #levels button:nth-child(1) { background: var(--play); box-shadow: 0 6px 0 #1f7a41; color: #fff }
+  #levels button:nth-child(3) { background: #ff9a3c; box-shadow: 0 6px 0 #b25f14; color: #fff }
+  #levels button:active { transform: translateY(4px) }
+  #levels button.chosen { outline: 5px solid var(--now); outline-offset: 4px }
   .enter { font-size: 40px; font-weight: 900; background: var(--play); color: #fff; border-radius: 18px; padding: 10px 28px; box-shadow: 0 6px 0 #1f7a41; cursor: pointer }
   .confetti { position: absolute; top: -20px; width: 14px; height: 22px; animation: fall linear forwards }
   @keyframes fall { to { transform: translateY(110vh) rotate(720deg) } }
@@ -173,7 +196,7 @@
     <div class="rule"><svg viewBox="0 0 100 100"><use href="#bot"/></svg><span class="mark no">✗</span></div>
   </div>
   <p>Deslize para cortar os bugs.<br>Não corte o robô!</p>
-  <div class="enter">▶</div>
+  <div id="levels"></div>
 </div>
 
 <div id="win" class="overlay"><div id="stars"></div><ul id="result" class="facts"></ul><div class="enter">⏎</div></div>
@@ -218,11 +241,17 @@
 </svg>
 
 <script>
-// Tuning the round: its length, how many robots may be cut, the points that earn 2 and 3 stars and the gravity in screen heights per second squared
+// Tuning the round: its length and the gravity in screen heights per second squared
 const ROUND_LENGTH = 30000
-const LIVES = 3
-const STAR_POINTS = [150, 300]
 const GRAVITY = 1.5
+
+// Setting each difficulty: how fast things fly, how many robots may be cut, how big the bugs are,
+// how often the robot shows up and the points that earn 2 and 3 stars
+const LEVELS = [
+  { icon: "🌱", name: "Fácil", speed: 0.75, lives: 5, size: 1.15, robots: 0.7, stars: [100, 200] },
+  { icon: "⚡", name: "Normal", speed: 1, lives: 3, size: 1, robots: 1, stars: [150, 300] },
+  { icon: "🔥", name: "Desafio", speed: 1.35, lives: 2, size: 0.9, robots: 1.3, stars: [200, 400] },
+]
 const INK = "#1d2a44"
 
 // Pairing each bug colour with a darker shade for its spots
@@ -242,7 +271,7 @@ const canvas = document.getElementById("canvas")
 const context = canvas.getContext("2d")
 let width = 0, height = 0
 let things = [], halves = [], sparks = [], labels = [], trail = [], lines = [], lineCount = 0
-let score = 0, lives = LIVES, bugsCut = 0, bestCombo = 0, strokeHits = 0, strokeEnd = { x: 0, y: 0 }, anchor
+let level = 1, score = 0, lives = LEVELS[level].lives, bugsCut = 0, bestCombo = 0, strokeHits = 0, strokeEnd = { x: 0, y: 0 }, anchor
 let running = false, swiping = false, round = 0, roundStart = 0, launchTimer, lastTick = -1, lastFrame = performance.now(), overlayTime = -Infinity
 let muted = false, audio, musicTimer, musicStep = 0
 
@@ -320,7 +349,7 @@ function resize() {
 // Redrawing the score and one robot head per life left
 function drawHud() {
   document.getElementById("score").textContent = score
-  document.getElementById("lives").innerHTML = Array.from({ length: LIVES }, (_, index) =>
+  document.getElementById("lives").innerHTML = Array.from({ length: LEVELS[level].lives }, (_, index) =>
     `<svg viewBox="0 0 100 100" class="${index < lives ? "" : "lost"}"><use href="#bot"/></svg>`).join("")
 }
 
@@ -331,14 +360,21 @@ function log(text, kind = "now") {
     `<li value="${line.number}" class="${line.kind === "bad" ? "bad" : index === lines.length - 1 ? "now" : ""}">${line.text}</li>`).join("")
 }
 
+// Ringing the level chosen last, which Enter starts again
+function markLevel() {
+  document.querySelectorAll("#levels button").forEach((button, index) => button.classList.toggle("chosen", index === level))
+}
+
 function showOverlay(id) {
   document.querySelectorAll("#start, #win, #final").forEach(overlay => overlay.classList.toggle("show", overlay.id === id))
   overlayTime = performance.now()
 }
 
-// Clearing the field, counting down from 3 and starting to throw bugs
-async function startRound() {
+// Clearing the field, counting down from 3 and starting to throw bugs at the chosen level
+async function startRound(chosen) {
   const thisRound = ++round
+  level = chosen
+  markLevel()
   showOverlay()
   things = []
   halves = []
@@ -348,7 +384,7 @@ async function startRound() {
   lines = []
   lineCount = 0
   score = 0
-  lives = LIVES
+  lives = LEVELS[level].lives
   bugsCut = 0
   bestCombo = 0
   lastTick = -1
@@ -376,19 +412,21 @@ function wave() {
   const progress = roundProgress()
   const count = 1 + (Math.random() < 0.3 + progress * 0.5 ? 1 : 0) + (progress > 0.5 && Math.random() < 0.4 ? 1 : 0)
   for (let index = 0; index < count; index++) setTimeout(launch, index * 150)
-  launchTimer = setTimeout(wave, 1150 - 550 * progress + Math.random() * 250)
+  launchTimer = setTimeout(wave, (1150 - 550 * progress + Math.random() * 250) / LEVELS[level].speed)
 }
 
 // Launching a bug, a golden bug, a big bug or the robot from below the field on an arc that peaks in its upper half
 function launch() {
   if (!running) return
-  const progress = roundProgress(), roll = Math.random()
+  const progress = roundProgress(), roll = Math.random(), { speed, size, robots } = LEVELS[level]
   let type = "bug"
   if (progress > 0.3 && roll < 0.07 && !things.some(thing => thing.type === "mega")) type = "mega"
   else if (roll < 0.15) type = "gold"
-  else if (roll < 0.31 + progress * 0.12) type = "robot"
-  const radius = (Math.min(width, height) * 0.085 + 8) * (type === "mega" ? 1.6 : type === "gold" ? 0.9 : 1)
-  const gravity = GRAVITY * height * (type === "mega" ? 0.55 : 1)
+  else if (roll < 0.15 + (0.16 + progress * 0.12) * robots) type = "robot"
+  const radius = (Math.min(width, height) * 0.085 + 8) * size * (type === "mega" ? 1.6 : type === "gold" ? 0.9 : 1)
+
+  // Scaling gravity by the square of the speed, so arcs keep their height but fly faster
+  const gravity = GRAVITY * height * speed * speed * (type === "mega" ? 0.55 : 1)
   const x = width * (0.15 + Math.random() * 0.7), target = width * (0.2 + Math.random() * 0.6)
   const vy = -Math.sqrt(2 * gravity * height * (0.5 + Math.random() * 0.3))
   const colorIndex = Math.floor(Math.random() * BUG_COLORS.length)
@@ -435,7 +473,7 @@ function hit(thing, angle) {
   if (thing.type === "mega" && thing.health > 1) {
     thing.health--
     thing.radius *= 0.85
-    thing.vy = Math.min(thing.vy, -GRAVITY * height * 0.3)
+    thing.vy = Math.min(thing.vy, -GRAVITY * height * 0.3 * LEVELS[level].speed)
     burst(thing.x, thing.y, thing.color, 10)
     addPoints(5, thing)
     beep([900], { type: "square", volume: 0.06, length: 0.08, slide: 400 })
@@ -532,11 +570,12 @@ function showWin() {
     piece.style.animationDelay = Math.random() * 0.6 + "s"
     overlay.append(piece)
   }
-  const stars = score >= STAR_POINTS[1] ? 3 : score >= STAR_POINTS[0] ? 2 : 1
+  const { icon, name, stars: starPoints } = LEVELS[level]
+  const stars = score >= starPoints[1] ? 3 : score >= starPoints[0] ? 2 : 1
   for (let index = 0; index < stars; index++) setTimeout(() => beep([1047 + index * 262]), 600 + index * 300)
   document.getElementById("stars").innerHTML = [0, 1, 2].map(index =>
     `<svg viewBox="0 0 100 100" class="${index < stars ? "" : "off"}" style="animation-delay: ${index * 0.3}s"><use href="#star"/></svg>`).join("")
-  document.getElementById("result").innerHTML = `<li>🐛 ${bugsCut}</li>${bestCombo >= 3 ? `<li>🔥 ${bestCombo}</li>` : ""}<li>⭐ ${score}</li>`
+  document.getElementById("result").innerHTML = `<li>${icon} ${name}</li><li>🐛 ${bugsCut}</li>${bestCombo >= 3 ? `<li>🔥 ${bestCombo}</li>` : ""}<li>⭐ ${score}</li>`
   showOverlay("win")
 }
 
@@ -736,11 +775,11 @@ function press(key) {
   if (key === "m" || key === "M") return toggleMute()
   if (running) return
   if (key === "q" || key === "Q") return phone.classList.add("show")
-  if (key !== "Enter" && key !== " ") return
+  if (key !== "Enter" && key !== " " && !LEVELS[key - 1]) return
 
   // Ignoring touches right after an overlay opens, so the end of a swipe does not skip the stars
   if (performance.now() - overlayTime < 700) return
-  if (isShown("start")) return startRound()
+  if (isShown("start")) return startRound(LEVELS[key - 1] ? key - 1 : level)
   if (isShown("win")) return showOverlay("final")
   if (isShown("final")) return showOverlay("start")
 }
@@ -779,7 +818,13 @@ document.addEventListener("keydown", event => {
   press(event.key)
 })
 document.getElementById("mute").addEventListener("click", toggleMute)
-document.querySelectorAll(".overlay").forEach(overlay => overlay.addEventListener("click", () => press("Enter")))
+
+// Starting only from a level button on the first screen, so a stray touch does not pick a level
+document.getElementById("levels").innerHTML = LEVELS.map((choice, index) =>
+  `<button data-level="${index + 1}" tabindex="-1">${choice.icon}<span>${choice.name}</span></button>`).join("")
+markLevel()
+document.getElementById("levels").addEventListener("click", event => event.target.closest("button") && press(event.target.closest("button").dataset.level))
+document.querySelectorAll(".overlay").forEach(overlay => overlay.addEventListener("click", () => overlay.id !== "start" && press("Enter")))
 document.querySelector("#final .also").addEventListener("click", event => event.stopPropagation())
 document.addEventListener("visibilitychange", () => document.hidden && finish())
 new ResizeObserver(resize).observe(field)
