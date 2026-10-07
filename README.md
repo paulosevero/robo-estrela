@@ -53,7 +53,13 @@ A pasta `dupla/` tem um jogo para duas pessoas, com o mesmo visual. Ele mostra c
 - Se o robô pisa num bug, o bug aparece, o passo errado fica vermelho e a dupla conserta só esse passo.
 - A dupla ganha 3 estrelas se chegar na primeira tentativa e uma estrela a menos a cada nova tentativa. Ao fim de cada nível, as duas pessoas trocam de papel.
 
-Quem joga sozinho pode tocar em 👀, ou apertar E, para ver os bugs por 2 segundos, ao custo de uma estrela. A tecla Q mostra em tela cheia o QR code do navegador. O mapa do navegador é a mesma página aberta com `?navegador` no fim do endereço, e ali as setas, os pontos do topo ou um deslize trocam o nível. Nos níveis, na lista `LEVELS`, `B` marca um bug escondido.
+Na primeira tela, a dupla escolhe a dificuldade, e cada uma tem 5 fases:
+
+- 🌱 **Fácil:** tabuleiros de 3×4 a 6×6, com mais de um caminho seguro.
+- ⚡ **Normal:** tabuleiros de 5×5 a 6×6, com caminhos de 8 a 12 passos. Em cada fase só existe um caminho seguro mais curto, e nenhum caminho em linha reta escapa dos bugs.
+- 🔥 **Desafio:** tabuleiros de 6×6 a 7×7, com mais bugs, caminhos de 10 a 12 passos que exigem voltas, e sem a opção de espiar.
+
+Quem joga sozinho pode tocar em 👀, ou apertar E, para ver os bugs por 2 segundos, ao custo de uma estrela. A tecla Q mostra em tela cheia o QR code do navegador. O mapa do navegador é a mesma página aberta com `?navegador` no fim do endereço. Ali, os botões do topo trocam a dificuldade, e as setas, os pontos ou um deslize trocam a fase. As fases ficam na lista `DIFFICULTIES`, em que `B` marca um bug escondido, e a fila aceita até 12 passos.
 
 ## Licença
 

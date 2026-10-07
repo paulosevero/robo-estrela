@@ -40,6 +40,7 @@
   .dot.now { box-shadow: 0 0 0 5px var(--now) }
   #peek, #mute { font-size: 26px; background: none; border: none; cursor: pointer; width: 48px }
   #peek { margin-left: 24px }
+  #peek.off { opacity: .3; cursor: default }
   #board {
     position: relative;
     display: grid;
@@ -83,12 +84,12 @@
   #code li.bad { background: var(--bad); border-radius: 6px }
   #queue { display: flex; gap: 6px; padding: 0; margin: 0; list-style: none }
   #queue li {
-    width: min(64px, 8.6vw);
+    width: min(58px, 6.8vw);
     aspect-ratio: 1;
     border: 4px dashed var(--cell-line);
     border-radius: 12px;
     background: #fff;
-    font-size: min(40px, 5.4vw);
+    font-size: min(36px, 4.6vw);
     font-weight: 900;
     display: grid;
     place-items: center;
@@ -128,7 +129,10 @@
     font-weight: 800;
     text-align: center;
   }
-  body.navigator #pages { display: flex }
+  body.navigator #pages, body.navigator #pick { display: flex }
+  #pick { display: none; gap: 10px }
+  #pick button { border: 4px solid transparent; border-radius: 999px; background: #fff; padding: 6px 16px; font-size: min(20px, 4.4vw); font-weight: 800; color: var(--ink); cursor: pointer }
+  #pick button.chosen { border-color: var(--now) }
   body.navigator #code, body.navigator #queue, body.navigator #arrows, body.navigator #peek, body.navigator #mute { display: none }
   body.navigator #board { touch-action: none }
   body.navigator .dot { cursor: pointer }
@@ -152,7 +156,31 @@
   .role svg { width: 100%; aspect-ratio: 1; padding: 8%; background: #fff; border: 5px solid var(--ink); border-radius: 28px }
   .role b { font-size: min(30px, 5.5vw); font-weight: 900 }
   .role span { font-size: min(19px, 3.8vw); font-weight: 700 }
+  #start { padding: 16px }
   #start small { font-size: min(18px, 3.8vw); font-weight: 700 }
+  #difficulties { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px }
+  #difficulties button {
+    width: min(150px, 27vw);
+    padding: 10px 0 8px;
+    border: none;
+    border-radius: 18px;
+    background: var(--key);
+    box-shadow: 0 6px 0 #b8941a;
+    color: var(--ink);
+    font-size: min(44px, 9vw);
+    font-weight: 900;
+    line-height: 1.1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+  }
+  #difficulties button span { font-size: min(20px, 4.4vw) }
+  #difficulties button:nth-child(1) { background: var(--play); box-shadow: 0 6px 0 #1f7a41; color: #fff }
+  #difficulties button:nth-child(3) { background: var(--erase); box-shadow: 0 6px 0 #b25f14; color: #fff }
+  #difficulties button:active { transform: translateY(4px) }
+  #difficulties button.chosen { outline: 5px solid var(--now); outline-offset: 4px }
   #swap { background: var(--key); border-radius: 999px; padding: 8px 24px; font-size: min(30px, 5.5vw); font-weight: 900; box-shadow: 0 5px 0 #b8941a }
   #final { overflow: auto; justify-content: flex-start; padding: 16px }
   #final > * { flex-shrink: 0 }
@@ -187,7 +215,7 @@
     nav button { width: 80px; height: 80px }
     nav .erase, nav .play { order: 1; margin: 0 }
     #queue { gap: 3px }
-    #queue li { width: 8.6vw; border-width: 3px }
+    #queue li { width: 6.8vw; border-width: 3px }
     html, body { overflow: auto }
   }
 </style>
@@ -195,6 +223,7 @@
 <body>
 
 <header><span id="dots"></span><button id="peek" tabindex="-1">👀</button><button id="mute" tabindex="-1">🔊</button></header>
+<div id="pick"></div>
 <div id="role"></div>
 <main><div id="board"></div><ol id="code"></ol></main>
 <ol id="queue"></ol>
@@ -225,8 +254,8 @@
       <span>Escaneia o QR, vê os bugs e diz o caminho</span>
     </div>
   </div>
-  <div class="enter">▶</div>
-  <small>Sozinho? Toque em 👀 para espiar os bugs.</small>
+  <div id="difficulties"></div>
+  <small>Sozinho? Toque em 👀 para espiar os bugs. No Desafio não dá para espiar!</small>
 </div>
 
 <div id="win" class="overlay"><div id="stars"></div><div id="swap"></div><div class="enter">⏎</div></div>
@@ -283,13 +312,31 @@
 </svg>
 
 <script>
-// Describing each level as rows of text, with R for the robot, * for the star, B for a bug only the navigator sees and . for a free cell
-const LEVELS = [
-  ["....", "R.B*", "...."],
-  ["R.B.", ".B..", "...B", "B..*"],
-  ["R..B.", ".B...", "B..B.", "..B.*"],
-  ["R...B", "BBB..", "...B.", ".B...", "...B*"],
-  ["R.B..B", "B..B..", ".B..B.", "B.B..B", ".B.B..", "....B*"],
+// Grouping five levels per difficulty. Each level is a list of rows of text, with R for the robot, * for the star,
+// B for a bug only the navigator sees and . for a free cell. From Normal on, every level has a single shortest safe path
+// and no straight path dodges all the bugs, and the Desafio levels also take away the peek
+const DIFFICULTIES = [
+  { icon: "🌱", name: "Fácil", peek: true, levels: [
+    ["....", "R.B*", "...."],
+    ["R.B.", ".B..", "...B", "B..*"],
+    ["R..B.", ".B...", "B..B.", "..B.*"],
+    ["R...B", "BBB..", "...B.", ".B...", "...B*"],
+    ["R.B..B", "B..B..", ".B..B.", "B.B..B", ".B.B..", "....B*"],
+  ] },
+  { icon: "⚡", name: "Normal", peek: true, levels: [
+    ["...BB", "....B", "...B*", ".B...", "R.B.B"],
+    ["B..B*B", ".B....", "RB....", "..BB..", "B....."],
+    ["R..B.", "BB...", "..B..", ".BB..", "BB...", "B*.B."],
+    ["R....B", "B..BB.", "B.B...", "......", ".BBB..", "..B*.B"],
+    ["B.BB.R", ".B...B", "..BB..", "B.B..B", "...B..", "*B...."],
+  ] },
+  { icon: "🔥", name: "Desafio", peek: false, levels: [
+    ["......", "RBB...", "BBB.BB", "B.B.B.", ".B...*", "..B..."],
+    ["RB.BBB.", "...B...", ".B.....", "B...B..", "...B..B", ".B.B*BB"],
+    [".B...R", "B.BB..", ".B..B.", ".*B...", "..B.B.", "B...B.", "BBB.B."],
+    ["RB.B.B.", ".......", "...BBB.", ".BB..B.", "...B*..", "B.B...B", "BB.BB.."],
+    ["....RB.", "B.B.BBB", "...B.BB", "..B...B", "....B..", "BBB..B.", "B.*...."],
+  ] },
 ]
 const MOVES = {
   ArrowLeft: [0, -1, "←", "esquerda", 392],
@@ -297,7 +344,7 @@ const MOVES = {
   ArrowDown: [1, 0, "↓", "baixo", 330],
   ArrowRight: [0, 1, "→", "direita", 440],
 }
-const QUEUE_LIMIT = 10
+const QUEUE_LIMIT = 12
 
 // Opening the page with ?navegador turns it into the navigator's map, which shows the bugs and has no controls
 const NAVIGATOR = new URLSearchParams(location.search).has("navegador")
@@ -308,7 +355,7 @@ const board = document.getElementById("board")
 const robot = document.createElement("div")
 robot.id = "robot"
 robot.innerHTML = '<svg viewBox="0 0 100 100"><use href="#bot"/></svg>'
-let level, rows, start, queue = [], culprit = -1, running = false, runs = 0, peeked = false, muted = false, audio, musicTimer, musicStep = 0
+let difficulty = 0, levels = DIFFICULTIES[difficulty].levels, level, rows, start, queue = [], culprit = -1, running = false, runs = 0, peeked = false, muted = false, audio, musicTimer, musicStep = 0
 
 const wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds))
 const isShown = id => document.getElementById(id).classList.contains("show")
@@ -351,19 +398,22 @@ function placeRobot([row, column], animate = true) {
 function resize() {
   const phone = innerWidth <= 600
   const share = NAVIGATOR ? 0.62 : phone ? 0.34 : 0.5
-  const cell = Math.min(innerHeight * share / rows.length, innerWidth * (phone ? 0.9 : 0.5) / rows[0].length, 130)
+
+  // Leaving room for the 6 px gaps around the cells, which add up on the wider boards
+  const cell = Math.min((innerHeight * share - 6 * (rows.length + 1)) / rows.length, (innerWidth * (phone ? 0.92 : 0.5) - 6 * (rows[0].length + 1)) / rows[0].length, 130)
   document.documentElement.style.setProperty("--cell", cell + "px")
 }
 
 // Building the grid of the chosen level with its bugs hidden and putting the robot at its start
 function loadLevel(number) {
   level = number
-  rows = LEVELS[level]
+  rows = levels[level]
   queue = []
   culprit = -1
   runs = 0
   peeked = false
   board.classList.remove("peek")
+  document.getElementById("peek").classList.toggle("off", !DIFFICULTIES[difficulty].peek)
   board.style.gridTemplateColumns = `repeat(${rows[0].length}, var(--cell))`
   board.innerHTML = rows.join("").split("").map(symbol =>
     `<div class="cell">${symbol === "*" ? '<svg><use href="#star"/></svg>' : symbol === "B" ? '<svg class="bug"><use href="#bug"/></svg>' : ""}</div>`).join("")
@@ -373,13 +423,14 @@ function loadLevel(number) {
   placeRobot(start, false)
   resize()
   document.querySelectorAll("#win, #final").forEach(overlay => overlay.classList.remove("show"))
-  document.getElementById("role").textContent = `🧭 Fase ${level + 1}: diga o caminho ao piloto e avise onde estão os bugs!`
+  document.getElementById("role").textContent = `🧭 ${DIFFICULTIES[difficulty].icon} Fase ${level + 1}: diga o caminho ao piloto e avise onde estão os bugs!`
+  document.querySelectorAll("#difficulties button, #pick button").forEach(button => button.classList.toggle("chosen", Number(button.dataset.difficulty) === difficulty))
   draw()
 }
 
 // Redrawing the level dots, the command queue and its code version, marking the current and the wrong step
 function draw(current = -1) {
-  document.getElementById("dots").innerHTML = LEVELS.map((_, index) =>
+  document.getElementById("dots").innerHTML = levels.map((_, index) =>
     `<span data-level="${index}" class="dot ${index < level ? "done" : ""} ${index === level ? "now" : ""}"></span>`).join(" ")
   document.getElementById("queue").innerHTML = Array.from({ length: QUEUE_LIMIT }, (_, index) =>
     `<li data-index="${index}" class="${queue[index] ? "full" : ""} ${index === current ? "now" : ""} ${index === culprit ? "bad" : ""}">${queue[index] ? MOVES[queue[index]][2] : ""}</li>`).join("")
@@ -451,28 +502,36 @@ function win() {
   document.getElementById("stars").innerHTML = [0, 1, 2].map(index =>
     `<svg viewBox="0 0 100 100" class="${index < stars ? "" : "off"}" style="animation-delay: ${index * 0.3}s"><use href="#star"/></svg>`).join("")
   const swap = document.getElementById("swap")
-  swap.textContent = `🔄 Troquem de lugar! 🧭 Fase ${level + 2}`
-  swap.hidden = level + 1 >= LEVELS.length
+  swap.textContent = `🔄 Troquem de lugar! 🧭 ${DIFFICULTIES[difficulty].icon} Fase ${level + 2}`
+  swap.hidden = level + 1 >= levels.length
   overlay.classList.add("show")
   level++
   draw()
   running = false
 }
 
-// Showing the bugs for 2 seconds to someone playing alone, which costs one star
+// Showing the bugs for 2 seconds to someone playing alone, which costs one star and is not allowed in the Desafio
 function peek() {
   if (running || document.querySelector(".overlay.show") || board.classList.contains("peek")) return
+  if (!DIFFICULTIES[difficulty].peek) return beep([200], { type: "square", volume: 0.08, length: 0.15 })
   peeked = true
   board.classList.add("peek")
   beep([660, 880], { volume: 0.12 })
   setTimeout(() => board.classList.remove("peek"), 2000)
 }
 
+// Switching to the five levels of a difficulty, starting from the first
+function chooseDifficulty(index) {
+  difficulty = index
+  levels = DIFFICULTIES[difficulty].levels
+  loadLevel(0)
+}
+
 // Letting the navigator flip through the maps with the arrows, the page keys or the level numbers
 function turnPage(key) {
-  if (key === "ArrowRight" || key === "PageDown") loadLevel((level + 1) % LEVELS.length)
-  else if (key === "ArrowLeft" || key === "PageUp") loadLevel((level + LEVELS.length - 1) % LEVELS.length)
-  else if (LEVELS[key - 1]) loadLevel(key - 1)
+  if (key === "ArrowRight" || key === "PageDown") loadLevel((level + 1) % levels.length)
+  else if (key === "ArrowLeft" || key === "PageUp") loadLevel((level + levels.length - 1) % levels.length)
+  else if (levels[key - 1]) loadLevel(key - 1)
 }
 
 // Handling one input, whether it came from the keyboard or from a click on a button
@@ -485,7 +544,13 @@ function press(key) {
   const phone = document.getElementById("phone")
   if (phone.classList.contains("show")) return phone.classList.remove("show")
   if (key === "q" || key === "Q") return phone.classList.add("show")
-  if (isShown("start")) return (key === "Enter" || key === " ") && document.getElementById("start").classList.remove("show")
+
+  // Starting from a difficulty button, a key from 1 to 3, or Enter to repeat the last difficulty
+  if (isShown("start")) {
+    if (key !== "Enter" && key !== " " && !DIFFICULTIES[key - 1]) return
+    chooseDifficulty(DIFFICULTIES[key - 1] ? key - 1 : difficulty)
+    return document.getElementById("start").classList.remove("show")
+  }
   if (isShown("final")) {
     if (key !== "Enter") return
     loadLevel(0)
@@ -493,7 +558,7 @@ function press(key) {
   }
   if (isShown("win")) {
     if (key !== "Enter" && key !== " ") return
-    if (level < LEVELS.length) return loadLevel(level)
+    if (level < levels.length) return loadLevel(level)
     return document.getElementById("final").classList.add("show")
   }
   if (MOVES[key] && queue.length < QUEUE_LIMIT) {
@@ -511,9 +576,9 @@ function press(key) {
     queue = []
     culprit = -1
   }
-  else if (LEVELS[key - 1]) return loadLevel(key - 1)
-  else if (key === "PageDown") return loadLevel((level + 1) % LEVELS.length)
-  else if (key === "PageUp") return loadLevel((level + LEVELS.length - 1) % LEVELS.length)
+  else if (levels[key - 1]) return loadLevel(key - 1)
+  else if (key === "PageDown") return loadLevel((level + 1) % levels.length)
+  else if (key === "PageUp") return loadLevel((level + levels.length - 1) % levels.length)
   else if (key === "e" || key === "E") return peek()
   else if (key === "m" || key === "M") toggleMute()
   draw()
@@ -532,7 +597,21 @@ document.addEventListener("keydown", event => {
 document.querySelectorAll("nav").forEach(buttons => buttons.addEventListener("click", event => event.target.dataset.key && press(event.target.dataset.key)))
 document.getElementById("peek").addEventListener("click", peek)
 document.getElementById("mute").addEventListener("click", toggleMute)
-document.querySelectorAll("#start, #win, #final, #phone").forEach(overlay => overlay.addEventListener("click", () => press("Enter")))
+document.querySelectorAll("#win, #final, #phone").forEach(overlay => overlay.addEventListener("click", () => press("Enter")))
+
+// Building the difficulty buttons of the first screen and of the navigator's map
+document.getElementById("difficulties").innerHTML = DIFFICULTIES.map((choice, index) =>
+  `<button data-difficulty="${index}" tabindex="-1">${choice.icon}<span>${choice.name}</span></button>`).join("")
+document.getElementById("pick").innerHTML = DIFFICULTIES.map((choice, index) =>
+  `<button data-difficulty="${index}" tabindex="-1">${choice.icon} ${choice.name}</button>`).join("")
+document.getElementById("difficulties").addEventListener("click", event => {
+  const button = event.target.closest("button")
+  if (button) press(String(Number(button.dataset.difficulty) + 1))
+})
+document.getElementById("pick").addEventListener("click", event => {
+  const button = event.target.closest("button")
+  if (button) chooseDifficulty(Number(button.dataset.difficulty))
+})
 document.querySelector("#final .also").addEventListener("click", event => event.stopPropagation())
 
 // Removing a clicked queue step, so a mouse user can fix a step in the middle
