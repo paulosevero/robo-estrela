@@ -54,7 +54,13 @@ A pasta `conecta/` tem um quebra-cabeça com o mesmo visual. Ele mostra como as 
 - Cada cabo e cada mensagem aparecem também como linha de código, como `celular.ligar(servidor)` e `banco.ler("foto")`.
 - A pessoa ganha 3 estrelas com os cabos mais curtos possíveis, 2 estrelas com até dois passos a mais e 1 estrela nos outros casos.
 
-Tocar num cabo apaga esse cabo, e Backspace apaga o último. R limpa todos os cabos, 1 a 5 trocam de nível e Q mostra o QR code em tela cheia. Nos níveis, na lista `LEVELS`, `P` é um celular, `S` é o servidor, `D` é o banco de dados e `#` é uma pedra. O jogo calcula sozinho o tamanho dos cabos mais curtos, então um nível novo precisa permitir que todos esses cabos caibam juntos sem se cruzar.
+Na primeira tela, a pessoa escolhe a dificuldade, e cada uma tem 5 fases:
+
+- 🌱 **Fácil:** tabuleiros de 3×5 a 6×6, com um a três celulares.
+- ⚡ **Normal:** tabuleiros de 5×6 a 7×7, com dois ou três celulares e caminhos mais longos.
+- 🔥 **Desafio:** tabuleiros de 6×7 a 8×8, sempre com três celulares. Os cabos mais curtos só cabem todos juntos de um ou poucos jeitos, entre centenas ou milhares de tentativas possíveis.
+
+Tocar num cabo apaga esse cabo, e Backspace apaga o último. R limpa todos os cabos, 1 a 5 trocam de fase e Q mostra o QR code em tela cheia. As fases ficam na lista `DIFFICULTIES`, em que `P` é um celular, `S` é o servidor, `D` é o banco de dados e `#` é uma pedra. O jogo calcula sozinho o tamanho dos cabos mais curtos, então uma fase nova precisa permitir que todos esses cabos caibam juntos sem se cruzar. Como o servidor só tem quatro lados, ele aceita no máximo três celulares e o banco de dados.
 
 ## Licença
 
