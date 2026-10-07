@@ -48,11 +48,11 @@ A pasta `certificado/` tem um certificado para as crianças levarem para casa no
 
 **[Abrir o certificado](https://paulosevero.github.io/robo-estrela/certificado/)**
 
-- Quem apresenta escreve os nomes da turma, um por linha, preenche a escola e a data e aperta Imprimir. Sai um certificado por criança, cada um numa folha A4 deitada.
+- Quem apresenta escreve os nomes da turma, um por linha, e preenche a escola e a data. Imprimir manda um certificado por criança para a impressora, cada um numa folha A4 deitada. Baixar PDF gera um arquivo com uma página por criança, para guardar, mandar para a escola ou imprimir depois.
 - Com os nomes em branco, sai um certificado com a linha vazia, para preencher à mão.
 - O certificado diz que a criança aprendeu como se faz um programa de computador e mostra quatro selos: montar um algoritmo, caçar bugs, programar em dupla e ligar um sistema.
 
-Os nomes ficam só na página aberta e não são guardados nem enviados para lugar nenhum. Nomes muito compridos diminuem sozinhos para caber numa linha.
+Cada certificado é desenhado como um único SVG, usado na prévia da tela, na impressão e no PDF, então os três saem iguais. O PDF é montado pela própria página, sem bibliotecas e sem internet. Os nomes ficam só na página aberta e não são guardados nem enviados para lugar nenhum. Nomes e escolas muito compridos diminuem sozinhos para caber na linha.
 
 ## Licença
 
