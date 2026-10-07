@@ -42,6 +42,27 @@ O jogo é um único arquivo, `index.html`, feito com HTML, CSS e JavaScript puro
 
 Os níveis ficam na lista `LEVELS`, no início do script. Cada nível é uma lista de linhas de texto em que `R` é o robô, `*` é a estrela, `#` é uma pedra e `.` é uma casa livre. Ao mudar um nível, atualize também o número de passos do caminho mais curto na lista `FEWEST_STEPS`, que decide as estrelas.
 
+## Programação em Dupla
+
+A pasta `dupla/` tem um jogo para duas pessoas, com o mesmo visual. Ele mostra como funciona a programação em dupla, em que uma pessoa escreve o código e a outra revisa e orienta.
+
+**[Jogar a Programação em Dupla](https://paulosevero.github.io/robo-estrela/dupla/)**
+
+- O **piloto** monta as setas do robô, como no jogo da estrela, mas os bugs do tabuleiro ficam escondidos para ele.
+- O **navegador** escaneia o QR code da primeira tela e vê no celular o mapa com todos os bugs. Ele diz o caminho ao piloto e avisa onde estão os bugs.
+- Se o robô pisa num bug, o bug aparece, o passo errado fica vermelho e a dupla conserta só esse passo.
+- A dupla ganha 3 estrelas se chegar na primeira tentativa e uma estrela a menos a cada nova tentativa. Ao fim de cada nível, as duas pessoas trocam de papel.
+
+Na primeira tela, a dupla escolhe a dificuldade, e cada uma tem 5 fases:
+
+- 🌱 **Fácil:** tabuleiros de 3×4 a 6×6, com mais de um caminho seguro.
+- ⚡ **Normal:** tabuleiros de 5×5 a 6×6, com caminhos de 8 a 12 passos. Em cada fase só existe um caminho seguro mais curto, e nenhum caminho em linha reta escapa dos bugs. A dupla tem 3 tentativas por fase.
+- 🔥 **Desafio:** tabuleiros de 6×6 a 7×7, com mais bugs, caminhos de 10 a 12 passos que exigem voltas, só 2 tentativas por fase e sem a opção de espiar.
+
+No Normal e no Desafio, as cabeças de robô ao lado dos pontos mostram as tentativas que restam. Quando elas acabam, a fase recomeça do zero, com todos os bugs escondidos de novo.
+
+Quem joga sozinho pode tocar em 👀, ou apertar E, para ver os bugs por 2 segundos, ao custo de uma estrela. A tecla Q mostra em tela cheia o QR code do navegador. O mapa do navegador é a mesma página aberta com `?navegador` no fim do endereço. Ali, os botões do topo trocam a dificuldade, e as setas, os pontos ou um deslize trocam a fase. As fases ficam na lista `DIFFICULTIES`, em que `B` marca um bug escondido, e a fila aceita até 12 passos.
+
 ## Licença
 
 Código sob a licença MIT. Veja o arquivo [LICENSE](LICENSE).
