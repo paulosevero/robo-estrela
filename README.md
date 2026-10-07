@@ -42,6 +42,19 @@ O jogo é um único arquivo, `index.html`, feito com HTML, CSS e JavaScript puro
 
 Os níveis ficam na lista `LEVELS`, no início do script. Cada nível é uma lista de linhas de texto em que `R` é o robô, `*` é a estrela, `#` é uma pedra e `.` é uma casa livre. Ao mudar um nível, atualize também o número de passos do caminho mais curto na lista `FEWEST_STEPS`, que decide as estrelas.
 
+## Programação em Dupla
+
+A pasta `dupla/` tem um jogo para duas pessoas, com o mesmo visual. Ele mostra como funciona a programação em dupla, em que uma pessoa escreve o código e a outra revisa e orienta.
+
+**[Jogar a Programação em Dupla](https://paulosevero.github.io/robo-estrela/dupla/)**
+
+- O **piloto** monta as setas do robô, como no jogo da estrela, mas os bugs do tabuleiro ficam escondidos para ele.
+- O **navegador** escaneia o QR code da primeira tela e vê no celular o mapa com todos os bugs. Ele diz o caminho ao piloto e avisa onde estão os bugs.
+- Se o robô pisa num bug, o bug aparece, o passo errado fica vermelho e a dupla conserta só esse passo.
+- A dupla ganha 3 estrelas se chegar na primeira tentativa e uma estrela a menos a cada nova tentativa. Ao fim de cada nível, as duas pessoas trocam de papel.
+
+Quem joga sozinho pode tocar em 👀, ou apertar E, para ver os bugs por 2 segundos, ao custo de uma estrela. A tecla Q mostra em tela cheia o QR code do navegador. O mapa do navegador é a mesma página aberta com `?navegador` no fim do endereço, e ali as setas, os pontos do topo ou um deslize trocam o nível. Nos níveis, na lista `LEVELS`, `B` marca um bug escondido.
+
 ## Licença
 
 Código sob a licença MIT. Veja o arquivo [LICENSE](LICENSE).
