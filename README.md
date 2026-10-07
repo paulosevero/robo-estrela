@@ -48,7 +48,7 @@ A pasta `certificado/` tem um certificado para as crianças levarem para casa no
 
 **[Abrir o certificado](https://paulosevero.github.io/robo-estrela/certificado/)**
 
-- Quem apresenta escreve os nomes da turma, um por linha, e preenche a escola e a data. Imprimir manda um certificado por criança para a impressora, cada um numa folha A4 deitada. Baixar PDF gera um arquivo com uma página por criança, para guardar, mandar para a escola ou imprimir depois.
+- Quem apresenta escreve os nomes da turma, um por linha, e preenche a escola, a data e o próprio nome, que aparece sobre a linha de quem apresentou os jogos. Imprimir manda um certificado por criança para a impressora, cada um numa folha A4 deitada. Baixar PDF gera um arquivo com uma página por criança, para guardar, mandar para a escola ou imprimir depois.
 - Com os nomes em branco, sai um certificado com a linha vazia, para preencher à mão.
 - O certificado diz que a criança aprendeu como se faz um programa de computador e mostra quatro selos: montar um algoritmo, caçar bugs, programar em dupla e ligar um sistema.
 
