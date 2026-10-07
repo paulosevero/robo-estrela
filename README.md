@@ -42,6 +42,18 @@ O jogo é um único arquivo, `index.html`, feito com HTML, CSS e JavaScript puro
 
 Os níveis ficam na lista `LEVELS`, no início do script. Cada nível é uma lista de linhas de texto em que `R` é o robô, `*` é a estrela, `#` é uma pedra e `.` é uma casa livre. Ao mudar um nível, atualize também o número de passos do caminho mais curto na lista `FEWEST_STEPS`, que decide as estrelas.
 
+## Certificado de Programador(a) Mirim
+
+A pasta `certificado/` tem um certificado para as crianças levarem para casa no fim da apresentação, com o mesmo visual dos jogos.
+
+**[Abrir o certificado](https://paulosevero.github.io/robo-estrela/certificado/)**
+
+- Quem apresenta escreve os nomes da turma, um por linha, preenche a escola e a data e aperta Imprimir. Sai um certificado por criança, cada um numa folha A4 deitada.
+- Com os nomes em branco, sai um certificado com a linha vazia, para preencher à mão.
+- O certificado diz que a criança aprendeu como se faz um programa de computador e mostra quatro selos: montar um algoritmo, caçar bugs, programar em dupla e ligar um sistema.
+
+Os nomes ficam só na página aberta e não são guardados nem enviados para lugar nenhum. Nomes muito compridos diminuem sozinhos para caber numa linha.
+
 ## Licença
 
 Código sob a licença MIT. Veja o arquivo [LICENSE](LICENSE).
