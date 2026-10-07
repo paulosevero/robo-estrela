@@ -42,6 +42,28 @@ O jogo é um único arquivo, `index.html`, feito com HTML, CSS e JavaScript puro
 
 Os níveis ficam na lista `LEVELS`, no início do script. Cada nível é uma lista de linhas de texto em que `R` é o robô, `*` é a estrela, `#` é uma pedra e `.` é uma casa livre. Ao mudar um nível, atualize também o número de passos do caminho mais curto na lista `FEWEST_STEPS`, que decide as estrelas.
 
+## Conecta o Sistema
+
+A pasta `conecta/` tem um quebra-cabeça com o mesmo visual. Ele mostra como as partes de um sistema conversam: o celular pede uma foto ao servidor, o servidor busca a foto no banco de dados e devolve a resposta.
+
+**[Jogar o Conecta o Sistema](https://paulosevero.github.io/robo-estrela/conecta/)**
+
+- A pessoa arrasta cabos do celular até o servidor e do servidor até o banco de dados, desviando das pedras. Os cabos não podem se cruzar.
+- Ligar o celular direto no banco de dados não é permitido, porque num sistema de verdade só o servidor fala com o banco.
+- Ao apertar ▶, os pacotes correm pelos cabos e a foto aparece em cada celular. Se faltar ligar alguma máquina, ela pisca em vermelho.
+- Cada cabo e cada mensagem aparecem também como linha de código, como `celular.ligar(servidor)` e `banco.ler("foto")`.
+- A pessoa ganha 3 estrelas com os cabos mais curtos possíveis, 2 estrelas com até dois passos a mais e 1 estrela nos outros casos.
+
+Na primeira tela, a pessoa escolhe a dificuldade, e cada uma tem 5 fases:
+
+- 🌱 **Fácil:** tabuleiros de 3×5 a 6×6, com um a três celulares.
+- ⚡ **Normal:** tabuleiros de 5×6 a 7×7, com dois ou três celulares e caminhos mais longos. O cabo é limitado: sobram só 4 casas além dos cabos mais curtos.
+- 🔥 **Desafio:** tabuleiros de 6×7 a 8×8, sempre com três celulares, e cabo só para os cabos mais curtos, sem nenhuma casa de sobra. Esses cabos só cabem todos juntos de um ou poucos jeitos, entre centenas ou milhares de tentativas possíveis.
+
+No Normal e no Desafio, o contador 🔌 no topo mostra quanto cabo já foi usado e quanto a fase permite. Quando o cabo acaba, ele para de crescer e o contador pisca, e a pessoa precisa apagar algum cabo e refazer o caminho.
+
+Tocar num cabo apaga esse cabo, e Backspace apaga o último. R limpa todos os cabos, 1 a 5 trocam de fase e Q mostra o QR code em tela cheia. As fases ficam na lista `DIFFICULTIES`, em que `P` é um celular, `S` é o servidor, `D` é o banco de dados e `#` é uma pedra. O jogo calcula sozinho o tamanho dos cabos mais curtos, então uma fase nova precisa permitir que todos esses cabos caibam juntos sem se cruzar. Como o servidor só tem quatro lados, ele aceita no máximo três celulares e o banco de dados.
+
 ## Licença
 
 Código sob a licença MIT. Veja o arquivo [LICENSE](LICENSE).
