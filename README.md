@@ -42,6 +42,20 @@ O jogo é um único arquivo, `index.html`, feito com HTML, CSS e JavaScript puro
 
 Os níveis ficam na lista `LEVELS`, no início do script. Cada nível é uma lista de linhas de texto em que `R` é o robô, `*` é a estrela, `#` é uma pedra e `.` é uma casa livre. Ao mudar um nível, atualize também o número de passos do caminho mais curto na lista `FEWEST_STEPS`, que decide as estrelas.
 
+## Conecta o Sistema
+
+A pasta `conecta/` tem um quebra-cabeça com o mesmo visual. Ele mostra como as partes de um sistema conversam: o celular pede uma foto ao servidor, o servidor busca a foto no banco de dados e devolve a resposta.
+
+**[Jogar o Conecta o Sistema](https://paulosevero.github.io/robo-estrela/conecta/)**
+
+- A pessoa arrasta cabos do celular até o servidor e do servidor até o banco de dados, desviando das pedras. Os cabos não podem se cruzar.
+- Ligar o celular direto no banco de dados não é permitido, porque num sistema de verdade só o servidor fala com o banco.
+- Ao apertar ▶, os pacotes correm pelos cabos e a foto aparece em cada celular. Se faltar ligar alguma máquina, ela pisca em vermelho.
+- Cada cabo e cada mensagem aparecem também como linha de código, como `celular.ligar(servidor)` e `banco.ler("foto")`.
+- A pessoa ganha 3 estrelas com os cabos mais curtos possíveis, 2 estrelas com até dois passos a mais e 1 estrela nos outros casos.
+
+Tocar num cabo apaga esse cabo, e Backspace apaga o último. R limpa todos os cabos, 1 a 5 trocam de nível e Q mostra o QR code em tela cheia. Nos níveis, na lista `LEVELS`, `P` é um celular, `S` é o servidor, `D` é o banco de dados e `#` é uma pedra. O jogo calcula sozinho o tamanho dos cabos mais curtos, então um nível novo precisa permitir que todos esses cabos caibam juntos sem se cruzar.
+
 ## Licença
 
 Código sob a licença MIT. Veja o arquivo [LICENSE](LICENSE).
