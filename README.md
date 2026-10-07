@@ -56,8 +56,10 @@ A pasta `dupla/` tem um jogo para duas pessoas, com o mesmo visual. Ele mostra c
 Na primeira tela, a dupla escolhe a dificuldade, e cada uma tem 5 fases:
 
 - 🌱 **Fácil:** tabuleiros de 3×4 a 6×6, com mais de um caminho seguro.
-- ⚡ **Normal:** tabuleiros de 5×5 a 6×6, com caminhos de 8 a 12 passos. Em cada fase só existe um caminho seguro mais curto, e nenhum caminho em linha reta escapa dos bugs.
-- 🔥 **Desafio:** tabuleiros de 6×6 a 7×7, com mais bugs, caminhos de 10 a 12 passos que exigem voltas, e sem a opção de espiar.
+- ⚡ **Normal:** tabuleiros de 5×5 a 6×6, com caminhos de 8 a 12 passos. Em cada fase só existe um caminho seguro mais curto, e nenhum caminho em linha reta escapa dos bugs. A dupla tem 3 tentativas por fase.
+- 🔥 **Desafio:** tabuleiros de 6×6 a 7×7, com mais bugs, caminhos de 10 a 12 passos que exigem voltas, só 2 tentativas por fase e sem a opção de espiar.
+
+No Normal e no Desafio, as cabeças de robô ao lado dos pontos mostram as tentativas que restam. Quando elas acabam, a fase recomeça do zero, com todos os bugs escondidos de novo.
 
 Quem joga sozinho pode tocar em 👀, ou apertar E, para ver os bugs por 2 segundos, ao custo de uma estrela. A tecla Q mostra em tela cheia o QR code do navegador. O mapa do navegador é a mesma página aberta com `?navegador` no fim do endereço. Ali, os botões do topo trocam a dificuldade, e as setas, os pontos ou um deslize trocam a fase. As fases ficam na lista `DIFFICULTIES`, em que `B` marca um bug escondido, e a fila aceita até 12 passos.
 
